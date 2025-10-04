@@ -119,7 +119,7 @@ const PetDetailPage = ({ pet, onClose, onApply }) => {
                 </p>
               </div>
               <span className="text-2xl font-bold text-emerald-600">
-                {petData.adoptionFee > 0 ? `$${petData.adoptionFee}` : 'Free'}
+                {petData.adoptionFee > 0 ? `${petData.adoptionFee}` : 'Free'}
               </span>
             </div>
 
