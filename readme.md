@@ -206,4 +206,7 @@ Pet photos and videos are stored locally in the `server/uploads/` directory. Fil
 ## License
 
 This project is open source and available for educational and commercial use.
+<<<<<<< HEAD:readme
 
+=======
+>>>>>>> 9d5e709f7b37087f726f605103cdbaf083b611d9:readme.md
