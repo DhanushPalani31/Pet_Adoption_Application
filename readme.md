@@ -1,5 +1,13 @@
 # Pet Adoption Platform
 
+## sample mail and pass
+
+1.mail:udhayadhanush97@gmail.com
+pass:Dhanush@3108
+
+2.mail:shakthisundar07@gmail.com
+pass:Dhanush@3108
+
 A comprehensive MERN stack web application for connecting pet shelters with potential adopters, featuring detailed pet profiles, application management, messaging system, and user reviews.
 
 ## Features
@@ -9,6 +17,7 @@ A comprehensive MERN stack web application for connecting pet shelters with pote
 - **Advanced Search & Filtering**: Find pets by species, breed, size, age, and location
 - **Application Management**: Submit and track adoption applications with comprehensive forms
 - **Messaging System**: Direct communication between adopters and shelters
+     **when we click on the message on view detail section ,message conersation intializes we ca check it out in message page and continue message their**
 - **User Reviews**: Rate and review shelters to help future adopters
 - **Favorites**: Save favorite pets for later viewing
 - **Foster Program**: Support for foster parents and fostered pets
