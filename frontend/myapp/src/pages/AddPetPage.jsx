@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from '../api/axios';
 import { ArrowLeft } from 'lucide-react';
 
@@ -29,13 +29,19 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
       state: '',
       zipCode: '',
     },
-    adoptionFee: 0,
+    adoptionFee: '',
     photos: [{ url: '', caption: '' }],
     videos: [{ url: '', caption: '' }],
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // ✅ Ping backend early to reduce first-request delay
+  useEffect(() => {
+    axios.get('/')
+      .catch(() => console.log("Backend might be sleeping... waking it up 💤"));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -109,9 +115,9 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
           value: parseInt(formData.age.value),
           unit: formData.age.unit,
         },
-        adoptionFee: parseFloat(formData.adoptionFee),
-        photos: formData.photos.filter(p => p.url),
-        videos: formData.videos.filter(v => v.url),
+        adoptionFee: parseInt(formData.adoptionFee), // ✅ store rupees as integer
+        photos: formData.photos.filter(p => p.url.trim() !== ''),
+        videos: formData.videos.filter(v => v.url.trim() !== ''),
       };
 
       await axios.post('/pets', cleanedData);
@@ -265,7 +271,7 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Adoption Fee ($)
+                  Adoption Fee (₹)
                 </label>
                 <input
                   type="number"
@@ -273,7 +279,6 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
                   value={formData.adoptionFee}
                   onChange={handleChange}
                   min="0"
-                  step="0.01"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
               </div>
@@ -293,6 +298,7 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
               />
             </div>
 
+            {/* ✅ Medical History */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Medical History</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -343,6 +349,7 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
               </div>
             </div>
 
+            {/* ✅ Behavior */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Behavior & Temperament</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -394,6 +401,7 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
               </div>
             </div>
 
+            {/* ✅ Location */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Location</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -436,6 +444,7 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
               </div>
             </div>
 
+            {/* ✅ Photos */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Photos</h3>
               {formData.photos.map((photo, index) => (
@@ -474,6 +483,7 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
               </button>
             </div>
 
+            {/* ✅ Videos */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Videos</h3>
               {formData.videos.map((video, index) => (
@@ -512,22 +522,13 @@ const AddPetPage = ({ onNavigate, onSuccess }) => {
               </button>
             </div>
 
-            <div className="flex space-x-4 pt-6">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-emerald-600 text-white py-3 rounded-lg font-semibold hover:bg-emerald-700 transition disabled:bg-gray-400"
-              >
-                {loading ? 'Creating...' : 'Create Pet Listing'}
-              </button>
-              <button
-                type="button"
-                onClick={() => onNavigate('my-pets')}
-                className="px-8 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition"
-              >
-                Cancel
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition disabled:opacity-60"
+            >
+              {loading ? 'Saving...' : 'Add Pet'}
+            </button>
           </form>
         </div>
       </div>
