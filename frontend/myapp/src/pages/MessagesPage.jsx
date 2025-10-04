@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { Send, User } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const MessagesPage = () => {
   const [conversations, setConversations] = useState([]);
@@ -11,10 +12,18 @@ const MessagesPage = () => {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
   const { user } = useAuth();
+  const location = useLocation();
 
   useEffect(() => {
-    fetchConversations();
-  }, []);
+    fetchConversations().then((data) => {
+      const params = new URLSearchParams(location.search);
+      const convoId = params.get("conversation");
+      if (convoId && data?.length > 0) {
+        const found = data.find((c) => c._id === convoId);
+        if (found) setSelectedConversation(found);
+      }
+    });
+  }, [location.search]);
 
   useEffect(() => {
     if (selectedConversation) {
@@ -39,6 +48,7 @@ const MessagesPage = () => {
       setLoading(true);
       const { data } = await axios.get('/messages/conversations');
       setConversations(data);
+      return data;
     } catch (error) {
       console.error('Error fetching conversations:', error);
     } finally {

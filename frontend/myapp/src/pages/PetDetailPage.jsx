@@ -13,12 +13,14 @@ import {
   CheckCircle,
   AlertCircle,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PetDetailPage = ({ pet, onClose, onApply }) => {
   const [petData, setPetData] = useState(pet);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (pet._id) {
@@ -46,6 +48,26 @@ const PetDetailPage = ({ pet, onClose, onApply }) => {
       setCurrentImageIndex(
         (prev) => (prev - 1 + petData.photos.length) % petData.photos.length
       );
+    }
+  };
+
+  const handleMessage = async () => {
+    try {
+      const participantId = petData.shelter?._id || petData.owner?._id;
+      if (!participantId) {
+        console.error("No participant found for messaging");
+        return;
+
+      }
+
+      const { data } = await axios.post("/messages/conversations", {
+        participantId,
+        petId: petData._id,
+      });
+
+      navigate(`/messages?conversation=${data._id}`);
+    } catch (error) {
+      console.error("Error starting conversation:", error);
     }
   };
 
@@ -143,103 +165,22 @@ const PetDetailPage = ({ pet, onClose, onApply }) => {
               <p className="text-gray-700 leading-relaxed">{petData.description}</p>
             </div>
 
-            <div className="mb-6">
-              <h3 className="text-xl font-bold mb-3">Characteristics</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                  <span className="text-gray-700">Size: {petData.size}</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                  <span className="text-gray-700">Color: {petData.color}</span>
-                </div>
-                {petData.behavior?.goodWithKids && (
-                  <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                    <span className="text-gray-700">Good with kids</span>
-                  </div>
-                )}
-                {petData.behavior?.goodWithPets && (
-                  <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                    <span className="text-gray-700">Good with pets</span>
-                  </div>
-                )}
-                {petData.behavior?.trained && (
-                  <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                    <span className="text-gray-700">Trained</span>
-                  </div>
-                )}
-                {petData.behavior?.energyLevel && (
-                  <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                    <span className="text-gray-700">
-                      Energy: {petData.behavior.energyLevel}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-xl font-bold mb-3">Medical Information</h3>
-              <div className="space-y-2">
-                {petData.medicalHistory?.vaccinated && (
-                  <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                    <span className="text-gray-700">Vaccinated</span>
-                  </div>
-                )}
-                {petData.medicalHistory?.spayedNeutered && (
-                  <div className="flex items-center">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 mr-2" />
-                    <span className="text-gray-700">Spayed/Neutered</span>
-                  </div>
-                )}
-                {petData.medicalHistory?.specialNeeds && (
-                  <div className="flex items-start">
-                    <AlertCircle className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" />
-                    <div>
-                      <span className="text-gray-700 font-medium">Special Needs: </span>
-                      <span className="text-gray-600">
-                        {petData.medicalHistory.specialNeeds}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {petData.shelter && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                <h3 className="text-xl font-bold mb-3">Shelter Information</h3>
-                <p className="text-gray-700 font-medium mb-2">
-                  {petData.shelter.shelterInfo?.name || petData.shelter.name}
-                </p>
-                {petData.shelter.email && (
-                  <div className="flex items-center text-gray-600 mb-1">
-                    <Mail className="w-4 h-4 mr-2" />
-                    <span>{petData.shelter.email}</span>
-                  </div>
-                )}
-                {petData.shelter.phone && (
-                  <div className="flex items-center text-gray-600">
-                    <Phone className="w-4 h-4 mr-2" />
-                    <span>{petData.shelter.phone}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
+            {/* ---- Apply + Message Buttons ---- */}
             {user && user.role === 'adopter' && petData.status === 'available' && (
-              <button
-                onClick={() => onApply(petData)}
-                className="w-full py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-lg mb-6"
-              >
-                Apply to Adopt
-              </button>
+              <div className="flex gap-4 mb-6">
+                <button
+                  onClick={() => onApply(petData)}
+                  className="flex-1 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-lg"
+                >
+                  Apply to Adopt
+                </button>
+                <button
+                  onClick={handleMessage}
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg"
+                >
+                  Message
+                </button>
+              </div>
             )}
 
             <ReviewSection
