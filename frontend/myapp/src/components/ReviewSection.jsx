@@ -20,13 +20,14 @@ const ReviewSection = ({ petId, reviews = [], onReviewAdded }) => {
 
     setLoading(true);
     try {
-      await axios.post(`/pets/${petId}/review`, {
+      await axios.post(`/pets/${petId}/reviews`, {
         rating,
         comment,
       });
       setShowForm(false);
       setRating(5);
       setComment('');
+      alert('Review submitted successfully!');
       if (onReviewAdded) onReviewAdded();
     } catch (error) {
       console.error('Error submitting review:', error);
